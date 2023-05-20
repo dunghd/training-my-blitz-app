@@ -5,6 +5,7 @@ import { useMutation } from "@blitzjs/rpc"
 import Layout from "src/core/layouts/Layout"
 import createQuestion from "src/questions/mutations/createQuestion"
 import { QuestionForm, FORM_ERROR } from "src/questions/components/QuestionForm"
+import { CreateQuestion } from "src/questions/validations"
 
 const NewQuestionPage = () => {
   const router = useRouter()
@@ -19,8 +20,8 @@ const NewQuestionPage = () => {
         // TODO use a zod schema for form validation
         //  - Tip: extract mutation's schema into a shared `validations.ts` file and
         //         then import and use it here
-        // schema={CreateQuestion}
-        // initialValues={{}}
+        schema={CreateQuestion}
+        initialValues={{ text: "", choices: [] }}
         onSubmit={async (values) => {
           try {
             const question = await createQuestionMutation(values)

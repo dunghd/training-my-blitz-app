@@ -1,12 +1,9 @@
-import { paginate } from "blitz";
-import { resolver } from "@blitzjs/rpc";
-import db, { Prisma } from "db";
+import { paginate } from "blitz"
+import { resolver } from "@blitzjs/rpc"
+import db, { Prisma } from "db"
 
 interface GetQuestionsInput
-  extends Pick<
-    Prisma.QuestionFindManyArgs,
-    "where" | "orderBy" | "skip" | "take"
-  > {}
+  extends Pick<Prisma.QuestionFindManyArgs, "where" | "orderBy" | "skip" | "take"> {}
 
 export default resolver.pipe(
   resolver.authorize(),
@@ -22,14 +19,14 @@ export default resolver.pipe(
       take,
       count: () => db.question.count({ where }),
       query: (paginateArgs) =>
-        db.question.findMany({ ...paginateArgs, where, orderBy }),
-    });
+        db.question.findMany({ ...paginateArgs, where, orderBy, include: { choices: true } }),
+    })
 
     return {
       questions,
       nextPage,
       hasMore,
       count,
-    };
+    }
   }
-);
+)

@@ -9,22 +9,40 @@ import { useParam } from "@blitzjs/next"
 import Layout from "src/core/layouts/Layout"
 import getQuestion from "src/questions/queries/getQuestion"
 import deleteQuestion from "src/questions/mutations/deleteQuestion"
+import updateChoice from "src/choices/mutations/updateChoice"
 
 export const Question = () => {
   const router = useRouter()
   const questionId = useParam("questionId", "number")
   const [deleteQuestionMutation] = useMutation(deleteQuestion)
-  const [question] = useQuery(getQuestion, { id: questionId })
+  const [question, { refetch }] = useQuery(getQuestion, { id: questionId })
+  const [updateChoiceMutation] = useMutation(updateChoice)
+
+  const handleVote = async (id: number) => {
+    try {
+      await updateChoiceMutation({ id })
+      refetch()
+    } catch (error) {
+      alert("Error updating choice " + JSON.stringify(error, null, 2))
+    }
+  }
 
   return (
     <>
       <Head>
-        <title>Question {question.id}</title>
+        <title>{question.text}</title>
       </Head>
 
       <div>
-        <h1>Question {question.id}</h1>
-        <pre>{JSON.stringify(question, null, 2)}</pre>
+        <h1>{question.text}</h1>
+        <ul>
+          {question.choices.map((choice) => (
+            <li key={choice.id}>
+              {choice.text} - {choice.votes} votes
+              <button onClick={() => handleVote(choice.id)}>Vote</button>
+            </li>
+          ))}
+        </ul>
 
         <Link legacyBehavior href={Routes.EditQuestionPage({ questionId: question.id })}>
           <a>Edit</a>
